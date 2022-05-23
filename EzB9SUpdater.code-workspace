@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"sound.h": "c",
+			"main.h": "c",
+			"graphics.h": "c"
+		}
+	}
+}

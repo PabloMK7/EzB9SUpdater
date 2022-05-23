@@ -1,0 +1,8 @@
+{
+    "canrun": "1",
+    "sb9si": "https://github.com/d0k3/SafeB9SInstaller/releases/download/v0.0.7/SafeB9SInstaller-20170605-122940.zip",
+    "sb9si_firm": "SafeB9SInstaller.firm",
+    "b9sf": "https://github.com/SciresM/boot9strap/releases/download/1.4/boot9strap-1.4.zip",
+    "b9sf_firm": "boot9strap.firm",
+    "b9sf_sha": "boot9strap.firm.sha"
+}
