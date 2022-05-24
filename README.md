@@ -12,7 +12,7 @@ This tool uses [SafeB9SInstaller](https://github.com/d0k3/SafeB9SInstaller) and 
     1. Power off your console.
     2. Press and hold the following button combination: `X + START + SELECT`.
     3. Without releasing those buttons, power on your device.
-    4. Your notification LED should lit up for a second ([status codes](https://github.com/PabloMK7/boot9strap/tree/patch-1#led-status-codes)). If it doesn't, the update wasn't installed properly.
+    4. Your notification LED should lit up for a second ([status codes](https://github.com/SciresM/boot9strap#led-status-codes)). If it doesn't, the update wasn't installed properly.
 
 ## Credits
 - [@Rinnegatamante](https://github.com/Rinnegatamante) : Zip extracting code from [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds).
