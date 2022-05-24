@@ -15,8 +15,18 @@ bool checkRunningUnsupported() {
 	return GET_VERSION_MAJOR(out) <= 8;
 }
 
+u8 firmLaunchParams[0x1000];
 bool isReboot() {
-	return fileExists("/ezb9stemp/reboot.flag");
+	Result res = pmAppInit();
+	if (R_SUCCEEDED(res)) {
+		res = PMAPP_GetFIRMLaunchParams(firmLaunchParams, sizeof(firmLaunchParams));
+		pmAppExit();
+		if (R_SUCCEEDED(res)) {
+			u64 mytid = 0x000400000ECB9500;
+			return memcmp(firmLaunchParams + 0x440, &mytid, sizeof(mytid)) == 0;
+		}
+	}
+	return false;
 }
 
 int main()
@@ -29,6 +39,7 @@ int main()
 	initUI();
 	bool continueInstall = true;
 	bool rebootintoitself = false;
+	bool totalreboot = false;
 	bool unsupported = checkRunningUnsupported();
 	clearTop();
 	if (isReboot()) {
@@ -49,6 +60,7 @@ int main()
 		{
 			if (keys & KEY_B) {
 				warningloop = false;
+				totalreboot = true;
 				ezB9SCleanup();
 			}
 			if (keys & KEY_START) {
@@ -109,9 +121,11 @@ int main()
 						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "the update procedure.");
 						updateUI();
 						svcSleepThread(10000000000);
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "\n\nPress and hold START until");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "\nPress and hold START until");
 						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "you see the SafeB9SInstaller");
 						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "menu and follow the instructions.");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "Don't release the START button");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "until you see SafeB9SInstaller.");
 					}
 					else
 					{	
@@ -180,6 +194,10 @@ int main()
 	if (rebootintoitself) {
 		nsInit();
 		NS_RebootToTitle(MEDIATYPE_SD, 0x000400000ECB9500);
+		for(;;);
+	}
+	if (totalreboot) {
+		svcKernelSetState(7);
 		for(;;);
 	}
 	return (0);

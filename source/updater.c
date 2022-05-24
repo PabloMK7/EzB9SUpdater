@@ -533,7 +533,7 @@ int zipCallBack(u32 curr, u32 total) {
 static void restorepayloadsdir() {
 	remove("/luma/payloads/SafeB9SInstaller.firm");
 	rmdir("/luma/payloads");
-	renameDir("/luma/payloadsold", "/luma/payloads");
+	renameDir("/luma/payloado", "/luma/payloads");
 }
 
 u64 ezB9SPerform() {
@@ -545,7 +545,8 @@ u64 ezB9SPerform() {
 	deleteDirectory("/ezb9stemp");
 	
 	char* outJsonConfig = NULL;
-	u32 ret = downloadString("https://ctgp7.page.link/EzB9SUpdaterConfig", &outJsonConfig);
+	// This uses a dynamic link, so that the URL to the config json can be changed.
+	u32 ret = downloadString("https://ezb9supdater.page.link/EzB9SUpdaterConfig", &outJsonConfig);
 	if (ret) {
 		if (outJsonConfig) free(outJsonConfig);
 		return (2ULL << 32) | ret;
@@ -663,7 +664,7 @@ u64 ezB9SPerform() {
 
 	remove("/boot9strap/boot9strap.firm");
 	remove("/boot9strap/boot9strap.firm.sha");
-	renameDir("/luma/payloads", "/luma/payloadsold");
+	renameDir("/luma/payloads", "/luma/payloado");
 	ret = copy_file(final_sb9si_firm, "/luma/payloads/SafeB9SInstaller.firm");
 	if (!ret) copy_file(final_b9sf_firm, "/boot9strap/boot9strap.firm");
 	if (!ret) copy_file(final_b9sf_sha, "/boot9strap/boot9strap.firm.sha");
@@ -674,17 +675,6 @@ u64 ezB9SPerform() {
 		sprintf(CURL_lastErrorCode, "Failed to copy files to final location");
 		return (13ULL << 32) | ret;
 	}
-
-	FILE* flagFile = fopen("/ezb9stemp/reboot.flag", "w");
-	if (!flagFile) {
-		json_value_free(root_value);
-		if (outJsonConfig) free(outJsonConfig);
-		sprintf(CURL_lastErrorCode, "Failed to create reboot flag");
-		restorepayloadsdir();
-		return (14ULL << 32) | ret;
-	}
-	fwrite("", 1, 1, flagFile);
-	fclose(flagFile);
 
 	json_value_free(root_value);
 	if (outJsonConfig) free(outJsonConfig);
