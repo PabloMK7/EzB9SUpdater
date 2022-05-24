@@ -10,11 +10,11 @@ A 3DS tool to update B9S to the latest version (currently v1.4) without the need
     1. Power off your console.
     2. Press and hold the following button combination: `X + START + SELECT`.
     3. Without releasing those buttons, power on your device.
-    4. Your notification LED should lit up for a second. If it didn't, the update wasn't installed properly.
+    4. Your notification LED should lit up for a second ([status codes](https://github.com/PabloMK7/boot9strap/tree/patch-1#led-status-codes)). If it didn't, the update wasn't installed properly.
 
 # Credits
 - [@Rinnegatamante](https://github.com/Rinnegatamante) : Zip extracting code from [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds).
-- [@](https://github.com/kgabis) : JSON parsing utility [parson](https://github.com/kgabis/parson).
+- [@Krzysztof Gabis](https://github.com/kgabis) : JSON parsing utility [parson](https://github.com/kgabis/parson).
 - [@Steveice10](https://github.com/Steveice10) : buildtools
 - [@Nanquitas](https://github.com/Nanquitas) : BootNTRSelector, from which this app is based.
 - [@Kartic](https://github.com/hax0kartik) : Little help with reboot code.
