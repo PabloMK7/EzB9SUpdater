@@ -121,15 +121,16 @@ int main()
 						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "the update procedure.");
 						updateUI();
 						svcSleepThread(10000000000);
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "\nPress and hold START until");
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "you see the SafeB9SInstaller");
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "menu and follow the instructions.");
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "Don't release the START button");
-						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "until you see SafeB9SInstaller.");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "\nPress and hold START until you");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "see the SafeB9SInstaller menu and");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "follow the instructions. Don't release");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "the START button until you see");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "SafeB9SInstaller. Do not power off");
+						newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "the device during the installation.");
 					}
 					else
 					{	
-						if (rethigh == 2) {
+						if (rethigh == 1) {
 							newAppTop(COLOR_RED, BOLD | MEDIUM | CENTER, "Download failed!");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Unable to connect to the internet,");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "please try again. If this problem");
@@ -138,7 +139,7 @@ int main()
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "\nYou can ask for help here");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "https://discord.gg/C29hYvh\n");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, FONT_B": Exit");
-						} else if (rethigh == 5) {
+						} else if (rethigh == 4) {
 							newAppTop(COLOR_RED, BOLD | MEDIUM | CENTER, "Download failed!");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "The author of this app has marked");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "it as \"obsolete\". Please look");

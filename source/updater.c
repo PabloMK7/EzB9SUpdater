@@ -508,28 +508,6 @@ exit:
 	return retcode;
 }
 
-void fileNameTrim(char* filename) {
-	int size = strlen(filename);
-	for (int i = size - 1; i >= 0; i--) {
-		char c = filename[i];
-		if (c == '\n' || c == '\r' || c == ' ') filename[i] = '\0';
-		else break;
-	}
-}
-
-int zipCallBack(u32 curr, u32 total) {
-	static u64 timer = 0;
-	if (Timer_HasTimePassed(10, timer)) {
-		timer = Timer_Restart();
-		clearTop();
-		newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "EzB9SUpdater");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Extracting files...");
-		newAppTop(DEFAULT_COLOR, CENTER | MEDIUM, "%d / %d", curr, total);
-		updateUI();
-	}
-	return 0;
-}
-
 static void restorepayloadsdir() {
 	remove("/luma/payloads/SafeB9SInstaller.firm");
 	rmdir("/luma/payloads");
@@ -549,13 +527,13 @@ u64 ezB9SPerform() {
 	u32 ret = downloadString("https://ezb9supdater.page.link/EzB9SUpdaterConfig", &outJsonConfig);
 	if (ret) {
 		if (outJsonConfig) free(outJsonConfig);
-		return (2ULL << 32) | ret;
+		return (1ULL << 32) | ret;
 	}
 
 	if (createDir("/ezb9stemp")) {
 		if (outJsonConfig) free(outJsonConfig);
 		sprintf(CURL_lastErrorCode, "Failed to create /ezb9stemp");
-		return (3ULL << 32) | ret;
+		return (2ULL << 32) | ret;
 	}
 
 	JSON_Value *root_value = json_parse_string(outJsonConfig);
@@ -563,13 +541,13 @@ u64 ezB9SPerform() {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
 		sprintf(CURL_lastErrorCode, "Invalid JSON config file.");
-		return (4ULL << 32) | ret;
+		return (3ULL << 32) | ret;
 	}
 	const char* canRun = json_object_get_string(json_value_get_object(root_value), "canrun");
 	if (strcmp(canRun, "1") != 0) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
-		return (5ULL << 32);
+		return (4ULL << 32) | ret;
 	}
 	const char* sb9si = json_object_get_string(json_value_get_object(root_value), "sb9si");
 	const char* sb9si_firm = json_object_get_string(json_value_get_object(root_value), "sb9si_firm");
@@ -581,7 +559,7 @@ u64 ezB9SPerform() {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
 		sprintf(CURL_lastErrorCode, "Invalid JSON config file.");
-		return (6ULL << 32);
+		return (5ULL << 32) | ret;
 	}
 
 	clearTop();
@@ -596,7 +574,7 @@ u64 ezB9SPerform() {
 	if (ret) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
-		return (7ULL << 32);
+		return (6ULL << 32) | ret;
 	}
 
 	fileDownCnt = 2;
@@ -605,7 +583,7 @@ u64 ezB9SPerform() {
 	if (ret) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
-		return (8ULL << 32);
+		return (7ULL << 32) | ret;
 	}
 
 	clearTop();
@@ -613,68 +591,114 @@ u64 ezB9SPerform() {
 	newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Extracting files...");
 	updateUI();
 
-	if (createDir("/ezb9stemp/sb9si") || createDir("/ezb9stemp/b9sf")) {
-		json_value_free(root_value);
-		if (outJsonConfig) free(outJsonConfig);
-		sprintf(CURL_lastErrorCode, "Failed to create zip output folders");
-		return (9ULL << 32) | ret;
-	}
-
-	Zip* sb9si_zip = ZipOpen("/ezb9stemp/sb9si.zip");
-	if (!sb9si_zip) {
-		json_value_free(root_value);
-		if (outJsonConfig) free(outJsonConfig);
-		sprintf(CURL_lastErrorCode, "Failed to open sb9si.zip");
-		return (10ULL << 32) | ret;
-	}
-	chdir("/ezb9stemp/sb9si");
-	ZipExtract(sb9si_zip, NULL, zipCallBack);
-	ZipClose(sb9si_zip);
-	chdir("/");
-
 	Zip* b9sf_zip = ZipOpen("/ezb9stemp/b9sf.zip");
 	if (!b9sf_zip) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
 		sprintf(CURL_lastErrorCode, "Failed to open b9sf.zip");
-		return (11ULL << 32) | ret;
+		return (8ULL << 32) | ret;
 	}
-	chdir("/ezb9stemp/b9sf");
-	ZipExtract(b9sf_zip, NULL, zipCallBack);
-	ZipClose(b9sf_zip);
-	chdir("/");
 
-	char final_sb9si_firm[0x80];
-	char final_b9sf_firm[0x80];
-	char final_b9sf_sha[0x80];
-	sprintf(final_sb9si_firm, "/ezb9stemp/sb9si/%s", sb9si_firm);
-	sprintf(final_b9sf_firm, "/ezb9stemp/b9sf/%s", b9sf_firm);
-	sprintf(final_b9sf_sha, "/ezb9stemp/b9sf/%s", b9sf_sha);
-	if (!fileExists(final_sb9si_firm) || !fileExists(final_b9sf_firm) || !fileExists(final_b9sf_sha)) {
+	ZipFile* b9sf_firm_data = ZipFileRead(b9sf_zip, b9sf_firm, NULL);
+	if (!b9sf_firm_data || !b9sf_firm_data->data) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
-		sprintf(CURL_lastErrorCode, "Files not found in downloaded zip");
-		return (12ULL << 32) | ret;
+		ZipClose(b9sf_zip);
+		sprintf(CURL_lastErrorCode, "Failed to find \"%s\" in zip file", b9sf_firm);
+		return (9ULL << 32) | ret;
 	}
+	FILE* b9sf_firm_file = fopen_mkdir("/boot9strap/boot9strap.firm", "w");
+	if (!b9sf_firm_file) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(b9sf_firm_data);
+		ZipClose(b9sf_zip);
+		sprintf(CURL_lastErrorCode, "Failed to open output file");
+		return (0xAULL << 32) | ret;
+	}
+	if (fwrite(b9sf_firm_data->data, 1, b9sf_firm_data->size, b9sf_firm_file) != b9sf_firm_data->size) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(b9sf_firm_data);
+		ZipClose(b9sf_zip);
+		fclose(b9sf_firm_file);
+		sprintf(CURL_lastErrorCode, "Failed to write output file");
+		return (0xBULL << 32) | ret;
+	}
+	ZipFileFree(b9sf_firm_data);
+	fclose(b9sf_firm_file);
+	
+	ZipFile* b9sf_sha_data = ZipFileRead(b9sf_zip, b9sf_sha, NULL);
+	if (!b9sf_sha_data || !b9sf_sha_data->data) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipClose(b9sf_zip);
+		sprintf(CURL_lastErrorCode, "Failed to find \"%s\" in zip file", b9sf_sha);
+		return (0xCULL << 32) | ret;
+	}
+	FILE* b9sf_sha_file = fopen_mkdir("/boot9strap/boot9strap.firm.sha", "w");
+	if (!b9sf_sha_file) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(b9sf_sha_data);
+		ZipClose(b9sf_zip);
+		sprintf(CURL_lastErrorCode, "Failed to open output file");
+		return (0xDULL << 32) | ret;
+	}
+	if (fwrite(b9sf_sha_data->data, 1, b9sf_sha_data->size, b9sf_sha_file) != b9sf_sha_data->size) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(b9sf_sha_data);
+		ZipClose(b9sf_zip);
+		fclose(b9sf_sha_file);
+		sprintf(CURL_lastErrorCode, "Failed to write output file");
+		return (0xEULL << 32) | ret;
+	}
+	ZipFileFree(b9sf_sha_data);
+	fclose(b9sf_sha_file);
+	ZipClose(b9sf_zip);
 
-	clearTop();
-	newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "EzB9SUpdater");
-	newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Copying files...");
-	updateUI();
-
-	remove("/boot9strap/boot9strap.firm");
-	remove("/boot9strap/boot9strap.firm.sha");
 	renameDir("/luma/payloads", "/luma/payloado");
-	ret = copy_file(final_sb9si_firm, "/luma/payloads/SafeB9SInstaller.firm");
-	if (!ret) copy_file(final_b9sf_firm, "/boot9strap/boot9strap.firm");
-	if (!ret) copy_file(final_b9sf_sha, "/boot9strap/boot9strap.firm.sha");
-	if (ret) {
+	Zip* sb9si_zip = ZipOpen("/ezb9stemp/sb9si.zip");
+	if (!sb9si_zip) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
 		restorepayloadsdir();
-		sprintf(CURL_lastErrorCode, "Failed to copy files to final location");
-		return (13ULL << 32) | ret;
+		sprintf(CURL_lastErrorCode, "Failed to open sb9si.zip");
+		return (0xFULL << 32) | ret;
 	}
+	ZipFile* sb9si_data = ZipFileRead(sb9si_zip, sb9si_firm, NULL);
+	if (!sb9si_data || !sb9si_data->data) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipClose(sb9si_zip);
+		restorepayloadsdir();
+		sprintf(CURL_lastErrorCode, "Failed to find \"%s\" in zip file", sb9si_firm);
+		return (0x10ULL << 32) | ret;
+	}
+	FILE* sb9si_file = fopen_mkdir("/luma/payloads/SafeB9SInstaller.firm", "w");
+	if (!sb9si_file) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(sb9si_data);
+		ZipClose(sb9si_zip);
+		restorepayloadsdir();
+		sprintf(CURL_lastErrorCode, "Failed to open output file");
+		return (0x11ULL << 32) | ret;
+	}
+	if (fwrite(sb9si_data->data, 1, sb9si_data->size, sb9si_file) != sb9si_data->size) {
+		json_value_free(root_value);
+		if (outJsonConfig) free(outJsonConfig);
+		ZipFileFree(sb9si_data);
+		ZipClose(sb9si_zip);
+		fclose(sb9si_file);
+		restorepayloadsdir();
+		sprintf(CURL_lastErrorCode, "Failed to write output file");
+		return (0x12ULL << 32) | ret;
+	}
+	ZipFileFree(sb9si_data);
+	fclose(sb9si_file);
+	ZipClose(sb9si_zip);
 
 	json_value_free(root_value);
 	if (outJsonConfig) free(outJsonConfig);
