@@ -517,34 +517,35 @@ void fileNameTrim(char* filename) {
 	}
 }
 
-u32 ensureBaseURL() {
-	int retcode = 0;
-	if (!baseDataURL) {
-		// In case the repository dies, I use a dynamic link (reuse the ctgp7 project) to get the config
-		retcode = downloadString("https://ctgp7.page.link/ezb9sconfig", &baseDataURL);
-		if (retcode) {
-			if (baseDataURL) free(baseDataURL);
-		} else {
-			fileNameTrim(baseDataURL);
-		}
+int zipCallBack(u32 curr, u32 total) {
+	static u64 timer = 0;
+	if (Timer_HasTimePassed(10, timer)) {
+		timer = Timer_Restart();
+		clearTop();
+		newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "EzB9SUpdater");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Extracting files...");
+		newAppTop(DEFAULT_COLOR, CENTER | MEDIUM, "%d / %d", curr, total);
+		updateUI();
 	}
-	return retcode;
+	return 0;
 }
 
-int zipCallBack(u32 curr, u32 total) {return 0;}
+static void restorepayloadsdir() {
+	remove("/luma/payloads/SafeB9SInstaller.firm");
+	rmdir("/luma/payloads");
+	renameDir("/luma/payloadsold", "/luma/payloads");
+}
 
 u64 ezB9SPerform() {
 	clearTop();
 	newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "EzB9SUpdater");
 	newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Preparing files...");
 	updateUI();
+
 	deleteDirectory("/ezb9stemp");
-	u32 ret = ensureBaseURL();
-	if (ret)
-		return (1ULL << 32) | ret;
 	
 	char* outJsonConfig = NULL;
-	ret = downloadString(baseDataURL, &outJsonConfig);
+	u32 ret = downloadString("https://ctgp7.page.link/EzB9SUpdaterConfig", &outJsonConfig);
 	if (ret) {
 		if (outJsonConfig) free(outJsonConfig);
 		return (2ULL << 32) | ret;
@@ -587,7 +588,9 @@ u64 ezB9SPerform() {
 	newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Downloading files...");
 	updateUI();
 
-	strcpy(updatingVer, "SafeB9SInstaller");
+	fileDownCnt = 1;
+	totFileDownCnt = 2;
+	strcpy(updatingVer, "EzB9SUpdater");
 	ret = downloadFile(sb9si, "/ezb9stemp/sb9si.zip");
 	if (ret) {
 		json_value_free(root_value);
@@ -595,8 +598,9 @@ u64 ezB9SPerform() {
 		return (7ULL << 32);
 	}
 
-	strcpy(updatingVer, "Boot9strap");
-	ret = downloadFile(sb9si, "/ezb9stemp/b9sf.zip");
+	fileDownCnt = 2;
+	totFileDownCnt = 2;
+	ret = downloadFile(b9sf, "/ezb9stemp/b9sf.zip");
 	if (ret) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
@@ -637,13 +641,14 @@ u64 ezB9SPerform() {
 	chdir("/ezb9stemp/b9sf");
 	ZipExtract(b9sf_zip, NULL, zipCallBack);
 	ZipClose(b9sf_zip);
+	chdir("/");
 
 	char final_sb9si_firm[0x80];
 	char final_b9sf_firm[0x80];
 	char final_b9sf_sha[0x80];
-	strcat("/ezb9stemp/sb9si/", sb9si_firm);
-	strcat("/ezb9stemp/b9sf/", b9sf_firm);
-	strcat("/ezb9stemp/b9sf/", b9sf_sha);
+	sprintf(final_sb9si_firm, "/ezb9stemp/sb9si/%s", sb9si_firm);
+	sprintf(final_b9sf_firm, "/ezb9stemp/b9sf/%s", b9sf_firm);
+	sprintf(final_b9sf_sha, "/ezb9stemp/b9sf/%s", b9sf_sha);
 	if (!fileExists(final_sb9si_firm) || !fileExists(final_b9sf_firm) || !fileExists(final_b9sf_sha)) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
@@ -658,13 +663,14 @@ u64 ezB9SPerform() {
 
 	remove("/boot9strap/boot9strap.firm");
 	remove("/boot9strap/boot9strap.firm.sha");
-	remove("/luma/payloads/SafeB9SInstaller.firm");
+	renameDir("/luma/payloads", "/luma/payloadsold");
 	ret = copy_file(final_sb9si_firm, "/luma/payloads/SafeB9SInstaller.firm");
 	if (!ret) copy_file(final_b9sf_firm, "/boot9strap/boot9strap.firm");
 	if (!ret) copy_file(final_b9sf_sha, "/boot9strap/boot9strap.firm.sha");
 	if (ret) {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
+		restorepayloadsdir();
 		sprintf(CURL_lastErrorCode, "Failed to copy files to final location");
 		return (13ULL << 32) | ret;
 	}
@@ -674,6 +680,7 @@ u64 ezB9SPerform() {
 		json_value_free(root_value);
 		if (outJsonConfig) free(outJsonConfig);
 		sprintf(CURL_lastErrorCode, "Failed to create reboot flag");
+		restorepayloadsdir();
 		return (14ULL << 32) | ret;
 	}
 	fwrite("", 1, 1, flagFile);
@@ -682,4 +689,14 @@ u64 ezB9SPerform() {
 	json_value_free(root_value);
 	if (outJsonConfig) free(outJsonConfig);
 	return 0;
+}
+
+void ezB9SCleanup() {
+	clearTop();
+	newAppTop(DEFAULT_COLOR, BOLD | MEDIUM | CENTER, "EzB9SUpdater");
+	newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Cleaning up files...");
+	updateUI();
+	deleteDirectory("/ezb9stemp");
+	restorepayloadsdir();
+	// Keep boot9strap firm files
 }

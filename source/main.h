@@ -145,7 +145,8 @@ int		downloadFile(const char* URL, char* filepath);
 int     downloadString(const char* URL, char** out);
 char*	getProgText(float prog, int index);
 FILE* fopen_mkdir(const char* name, const char* mode);
-u64 ezB9SPerform(); 
+u64 ezB9SPerform();
+void ezB9SCleanup();
 
 /*
 * stubsvc.c

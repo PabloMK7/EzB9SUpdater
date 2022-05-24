@@ -57,7 +57,7 @@ ifeq ($(TARGET),3DS)
     LIBRARIES += citro3d ctru png z m curl mbedtls mbedx509 mbedcrypto
 
     PRODUCT_CODE := CTR-P-EZB9
-    UNIQUE_ID := 0xECB92
+    UNIQUE_ID := 0xECB95
 
     CATEGORY := Application
     USE_ON_SD := true
