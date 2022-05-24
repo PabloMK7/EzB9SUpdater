@@ -35,15 +35,14 @@ int main()
 		clearTop();
 		newAppTop(DEFAULT_COLOR, MEDIUM | BOLD | CENTER, "EzB9SUpdater");
 		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "You should have returned from");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "SafeB9SInstaller. If that wasn't");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "the case, you probably released");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "the START button too early.");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "If you installed B9S properly");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "you can exit this app.");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "SafeB9SInstaller. If that wasn't the");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "case, you probably released the START");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "button too early. If you installed");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "B9S properly you can exit this app.");
 		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Having issues? Ask here:");
 		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "https://discord.gg/C29hYvh");
+		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "\nHold START: Launch SafeB9SInstaller");
 		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, FONT_B": Exit");
-		newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "START: Launch SafeB9SInstaller");
 		u32 keys = 0;
 		bool warningloop = true;
 		while (warningloop && aptMainLoop())
@@ -89,8 +88,8 @@ int main()
 			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "B9S to the latest version.");
 			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Running this tool with the");
 			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "latest version already installed");
-			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "has have no effect, so feel");
-			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "free to try it anyways.\n");
+			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "has no effect, so feel free to try");
+			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "to update it anyways.\n");
 			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, FONT_A": Proceed");
 			newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, FONT_B": Exit");
 			u32 keys = 0;
@@ -116,7 +115,7 @@ int main()
 					}
 					else
 					{	
-						if (retlow == 2) {
+						if (rethigh == 2) {
 							newAppTop(COLOR_RED, BOLD | MEDIUM | CENTER, "Download failed!");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "Unable to connect to the internet,");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "please try again. If this problem");
@@ -125,7 +124,7 @@ int main()
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "\nYou can ask for help here");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "https://discord.gg/C29hYvh\n");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, FONT_B": Exit");
-						} else if (retlow == 5) {
+						} else if (rethigh == 5) {
 							newAppTop(COLOR_RED, BOLD | MEDIUM | CENTER, "Download failed!");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "The author of this app has marked");
 							newAppTop(DEFAULT_COLOR, MEDIUM | CENTER, "it as \"obsolete\". Please look");
@@ -148,9 +147,9 @@ int main()
 					bool installLoop2 = true;
 					while (installLoop2 && aptMainLoop())
 					{
-						if ((retlow && (keys2 & KEY_B)) || (!retlow && (keys2 & KEY_START))) {
+						if ((rethigh && (keys2 & KEY_B)) || (!rethigh && (keys2 & KEY_START))) {
 							installLoop2 = false;
-							if (!retlow && (keys2 & KEY_START))
+							if (!rethigh && (keys2 & KEY_START))
 								rebootintoitself = true;
 						}
 						updateUI();
