@@ -1,5 +1,6 @@
 # EzB9SUpdater - Easy Boot9Strap Updater
 A 3DS tool to update B9S to the latest version (currently v1.4) without the need of a computer or SD card reader.
+
 This tool uses [SafeB9SInstaller](https://github.com/d0k3/SafeB9SInstaller) and [Boot9Strap](https://github.com/SciresM/boot9strap).
 
 ## Usage
