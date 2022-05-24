@@ -19,4 +19,4 @@ This tool uses [SafeB9SInstaller](https://github.com/d0k3/SafeB9SInstaller) and 
 - [@Krzysztof Gabis](https://github.com/kgabis) : JSON parsing utility [parson](https://github.com/kgabis/parson).
 - [@Steveice10](https://github.com/Steveice10) : buildtools
 - [@Nanquitas](https://github.com/Nanquitas) : BootNTRSelector, from which this app is based.
-- [@Kartic](https://github.com/hax0kartik) : Little help with reboot code.
+- [@Kartik](https://github.com/hax0kartik) : Little help with reboot code.
