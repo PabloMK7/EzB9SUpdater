@@ -2,7 +2,7 @@
 A 3DS tool to update B9S to the latest version (currently v1.4) without the need of external tools.
 
 # Usage
-1. Install the EzB9SUpdater cia file from the [Releases](https://github.com/PabloMK7/EzB9SUpdater/releases/latest) page. Alternatively use this QR code with FBI remote install.
+1. Install the EzB9SUpdater cia file from the [Releases](https://github.com/PabloMK7/EzB9SUpdater/releases/latest) page. Alternatively use [this QR code](https://user-images.githubusercontent.com/10946643/170048287-b54c9e0f-374b-4117-a567-2a30c23b5e29.png) with FBI remote install.
 2. Launch the EzB9SUpdtaer app from the Home Menu.
 3. Follow the instructions in the app. At some point, you will be asked to press and hold the START button to reboot into SafeB9SInstaller. It is important that you keep holding the button until you see the SafeB9SInstaller screen. Otherwise, the console will just reboot into EzB9SUpdater and no update will be performed.
 4. Once you finish the B9S update, you can exit the app and uninstall it from FBI.
