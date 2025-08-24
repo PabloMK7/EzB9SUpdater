@@ -28,12 +28,17 @@ VERSION_MAJOR := 1
 VERSION_MINOR := 0
 VERSION_MICRO := 1
 
+ifndef EZB9S_CONFIG_LINK
+$(error You must pass EZB9S_CONFIG_LINK on the make command line, e.g. 'make EZB9S_CONFIG_LINK="https://example.com"')
+endif
+
 BUILD_FLAGS := -march=armv6k -mtune=mpcore -mfloat-abi=hard
 BUILD_FLAGS_CC := -g -Wall -Wno-strict-aliasing -O3 -mword-relocations \
 					-fomit-frame-pointer -ffast-math $(ARCH) $(INCLUDE) -D__3DS__ $(BUILD_FLAGS) \
 					-DAPP_VERSION_MAJOR=${VERSION_MAJOR} \
 					-DAPP_VERSION_MINOR=${VERSION_MINOR} \
-					-DAPP_VERSION_MICRO=${VERSION_MICRO}
+					-DAPP_VERSION_MICRO=${VERSION_MICRO} \
+                    -DEZB9S_CONFIG_LINK=\"${EZB9S_CONFIG_LINK}\"
 
 BUILD_FLAGS_CXX := $(COMMON_FLAGS) -std=gnu++11
 RUN_FLAGS :=

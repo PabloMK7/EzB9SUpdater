@@ -524,7 +524,7 @@ u64 ezB9SPerform() {
 	
 	char* outJsonConfig = NULL;
 	// This uses a dynamic link, so that the URL to the config json can be changed.
-	u32 ret = downloadString("https://ezb9supdater.page.link/EzB9SUpdaterConfig", &outJsonConfig);
+	u32 ret = downloadString(EZB9S_CONFIG_LINK, &outJsonConfig);
 	if (ret) {
 		if (outJsonConfig) free(outJsonConfig);
 		return (1ULL << 32) | ret;
