@@ -5,14 +5,14 @@ This tool uses [SafeB9SInstaller](https://github.com/d0k3/SafeB9SInstaller) and 
 
 ## Usage
 1. Install the EzB9SUpdater cia file from the [Releases](https://github.com/PabloMK7/EzB9SUpdater/releases/latest) page. Alternatively use [this QR code](https://user-images.githubusercontent.com/10946643/170087006-a46d23f2-a15c-45ac-aaf3-d539533960b9.png) with FBI remote install.
-2. Launch the EzB9SUpdtaer app from the Home Menu.
+2. Launch the EzB9SUpdater app from the Home Menu.
 3. Follow the instructions in the app. At some point, you will be asked to press and hold the START button to reboot into SafeB9SInstaller. It is important that you keep holding the button until you see the SafeB9SInstaller screen. Otherwise, the console will just reboot into EzB9SUpdater again and no update will be performed.
 4. Once you finish the B9S update, you can exit the app and uninstall it from FBI.
 5. In order to check if you updated B9S from 1.3 to 1.4 do the following steps:
     1. Power off your console.
     2. Press and hold the following button combination: `X + START + SELECT`.
     3. Without releasing those buttons, power on your device.
-    4. Your notification LED should lit up for a second ([status codes](https://github.com/PabloMK7/boot9strap/tree/patch-1#led-status-codes)). If it doesn't, the update wasn't installed properly.
+    4. Your notification LED should lit up for a second ([status codes](https://github.com/SciresM/boot9strap#led-status-codes)). If it doesn't, the update wasn't installed properly.
 
 ## Credits
 - [@Rinnegatamante](https://github.com/Rinnegatamante) : Zip extracting code from [lpp-3ds](https://github.com/Rinnegatamante/lpp-3ds).
